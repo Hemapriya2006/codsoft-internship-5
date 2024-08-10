@@ -1,0 +1,63 @@
+#include <iostream>
+#include <vector>
+#include <cstdlib> // For rand()
+
+using namespace std;
+
+// Function to apply grayscale filter
+vector<unsigned char> applyGrayscale(const vector<unsigned char>& pixels, int width, int height) {
+    vector<unsigned char> grayPixels(width * height * 3); // Size is the same as input
+    for (int i = 0; i < width * height; ++i) {
+        unsigned char r = pixels[i * 3];
+        unsigned char g = pixels[i * 3 + 1];
+        unsigned char b = pixels[i * 3 + 2];
+        unsigned char gray = static_cast<unsigned char>(0.299 * r + 0.587 * g + 0.114 * b);
+        grayPixels[i * 3] = gray;
+        grayPixels[i * 3 + 1] = gray;
+        grayPixels[i * 3 + 2] = gray;
+    }
+    return grayPixels;
+}
+
+// Function to resize image (simple nearest-neighbor resizing)
+vector<unsigned char> resizeImage(const vector<unsigned char>& pixels, int oldWidth, int oldHeight, int newWidth, int newHeight) {
+    vector<unsigned char> resizedPixels(newWidth * newHeight * 3);
+    for (int y = 0; y < newHeight; ++y) {
+        for (int x = 0; x < newWidth; ++x) {
+            int oldX = x * oldWidth / newWidth;
+            int oldY = y * oldHeight / newHeight;
+            int oldOffset = (oldY * oldWidth + oldX) * 3;
+            int newOffset = (y * newWidth + x) * 3;
+            resizedPixels[newOffset] = pixels[oldOffset];
+            resizedPixels[newOffset + 1] = pixels[oldOffset + 1];
+            resizedPixels[newOffset + 2] = pixels[oldOffset + 2];
+        }
+    }
+    return resizedPixels;
+}
+
+int main() {
+    const int width = 800;
+    const int height = 600;
+
+    // Create a simple image with random colors
+    vector<unsigned char> pixels(width * height * 3);
+    for (size_t i = 0; i < pixels.size(); ++i) {
+        pixels[i] = static_cast<unsigned char>(rand() % 256);
+    }
+
+    // Apply grayscale filter
+    vector<unsigned char> grayPixels = applyGrayscale(pixels, width, height);
+
+    // Resize image
+    int newWidth = width / 2;
+    int newHeight = height / 2;
+    vector<unsigned char> resizedPixels = resizeImage(pixels, width, height, newWidth, newHeight);
+
+    // Output dimensions
+    cout << "Original image size: " << width << "x" << height << endl;
+    cout << "Grayscale image size: " << width << "x" << height << endl;
+    cout << "Resized image size: " << newWidth << "x" << newHeight << endl;
+
+    return 0;
+}
